@@ -65,7 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/home" className="flex items-center gap-2 group">
-            <span className="campeer-logo text-2xl tracking-tight select-none">CAMPEER</span>
+           <span className="campeer-logo text-lg tracking-tight select-none">CAMPEER</span>
           </Link>
 
           {/* Desktop Nav */}
