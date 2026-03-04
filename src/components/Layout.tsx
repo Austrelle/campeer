@@ -155,7 +155,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-4 text-center text-slate-600 text-xs font-body">
-        © 2026   <span className="text-slate-500">CAMPEER</span> — Campus Academic Marketplace for Peer Exchange and Earning Resources
+        © 2026   <span className="text-slate-500">CAMPEER</span>
       </footer>
     </div>
   );
