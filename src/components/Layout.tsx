@@ -2,88 +2,86 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import {
-  Home, BookOpen, PlusCircle, User, Info, MessageSquare,
-  Shield, LogOut, Menu, X, Bell, ChevronDown
-} from 'lucide-react';
-import {
-  collection, query, where, onSnapshot, orderBy
-} from 'firebase/firestore';
+import { Home, BookOpen, PlusCircle, User, Info, MessageSquare, Shield, LogOut, Menu, X } from 'lucide-react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Notification } from '../types';
+import { useSessionTimeout } from '../hooks/useSessionTimeout';
+import SessionTimeoutModal from './SessionTimeoutModal';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { userProfile, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [taskCount, setTaskCount] = useState(0);
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [taskCount,  setTaskCount]  = useState(0);
 
+  // Close mobile menu on navigation
+  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu open
   useEffect(() => {
-    if (!userProfile) return;
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', userProfile.uid),
-      orderBy('createdAt', 'desc')
-    );
-    const unsub = onSnapshot(q, snap => {
-      setNotifications(snap.docs.map(d => ({ id: d.id, ...d.data() } as Notification)));
-    });
-    return unsub;
-  }, [userProfile]);
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
+  // Open task count badge
   useEffect(() => {
     const q = query(collection(db, 'tasks'), where('status', '==', 'open'));
-    const unsub = onSnapshot(q, snap => setTaskCount(snap.size));
-    return unsub;
+    return onSnapshot(q, snap => setTaskCount(snap.size));
   }, []);
 
-  const unread = notifications.filter(n => !n.read).length;
-  const isAdmin = userProfile?.role === 'admin';
+  const handleLogout = async () => { await logout(); navigate('/login'); };
+
+  // Session timeout
+  const { showWarning, countdown, stayLoggedIn } = useSessionTimeout({
+    onLogout: handleLogout,
+    enabled:  !!userProfile,
+  });
+
+  const isAdmin  = userProfile?.role === 'admin';
+  const initials = userProfile?.fullName?.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'U';
 
   const navLinks = [
-    { to: '/home', icon: Home, label: 'Home' },
-    { to: '/tasks', icon: BookOpen, label: 'Tasks', badge: taskCount },
+    { to: '/home',      icon: Home,          label: 'Home'                          },
+    { to: '/tasks',     icon: BookOpen,      label: 'Tasks',    badge: taskCount    },
     ...(!isAdmin ? [{ to: '/post-task', icon: PlusCircle, label: 'Post Task' }] : []),
-    { to: '/about', icon: Info, label: 'About' },
-    { to: '/feedback', icon: MessageSquare, label: 'Feedback' },
+    { to: '/about',     icon: Info,          label: 'About'                         },
+    { to: '/feedback',  icon: MessageSquare, label: 'Feedback'                      },
     ...(isAdmin ? [{ to: '/admin', icon: Shield, label: 'Admin' }] : []),
-    { to: '/profile', icon: User, label: 'Profile' },
+    { to: '/profile',   icon: User,          label: 'Profile'                       },
   ];
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 glass border-b border-white/10 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+
+      {/* ── Session Timeout Modal ── */}
+      {showWarning && (
+        <SessionTimeoutModal countdown={countdown} onStay={stayLoggedIn} onLogout={handleLogout} />
+      )}
+
+      {/* ── Navbar ── */}
+      <header className="sticky top-0 z-50 border-b border-white/8"
+        style={{ background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-2">
+
           {/* Logo */}
-          <Link to="/home" className="flex items-center gap-2 group">
-            <span className="campeer-logo text-2xl tracking-tight select-none">CAMPEER</span>
+          <Link to="/home" className="shrink-0 flex items-center" onClick={() => setMenuOpen(false)}>
+            <span className="campeer-logo text-xl sm:text-2xl select-none">CAMPEER</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop nav links */}
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
             {navLinks.map(({ to, icon: Icon, label, badge }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+              <Link key={to} to={to}
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
                   ${location.pathname === to
                     ? 'bg-sky-500/15 text-sky-400 border border-sky-500/25'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                  }`}
-              >
-                <Icon size={15} />
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}>
+                <Icon size={14} />
                 {label}
-                {badge && badge > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-sky-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {badge != null && badge > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-sky-500
+                                   text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                     {badge > 9 ? '9+' : badge}
                   </span>
                 )}
@@ -91,71 +89,95 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-2">
-    
-
-            {/* User menu */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl glass cursor-pointer"
-              onClick={() => navigate('/profile')}>
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white">
-                {userProfile?.fullName?.charAt(0) || 'U'}
+          {/* Right side actions */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* User avatar button */}
+            <button onClick={() => navigate('/profile')}
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl glass hover:bg-white/10 transition-all active:scale-95">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-violet-600
+                              flex items-center justify-center text-xs font-bold text-white shrink-0">
+                {initials}
               </div>
-              <span className="hidden sm:block text-sm text-slate-300 max-w-[100px] truncate">
+              <span className="hidden sm:block text-sm text-slate-300 max-w-[80px] truncate">
                 {userProfile?.fullName?.split(' ')[0]}
               </span>
-              {isAdmin && <span className="hidden sm:block badge-pending text-[10px] py-0.5 px-1.5">Admin</span>}
-            </div>
+              {isAdmin && <span className="hidden md:block badge-pending text-[9px] py-0.5 px-1.5 shrink-0">Admin</span>}
+            </button>
 
             {/* Logout */}
-            <button onClick={handleLogout} className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+            <button onClick={handleLogout} title="Log out"
+              className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all hidden sm:flex items-center justify-center">
               <LogOut size={16} />
             </button>
 
-            {/* Mobile menu toggle */}
-            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5">
+            {/* Hamburger */}
+            <button onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu"
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all">
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* ── Mobile fullscreen menu ── */}
         {menuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#020617]/95 backdrop-blur-xl">
-            <nav className="flex flex-col py-2 px-4 gap-1">
+          <div className="lg:hidden fixed inset-0 top-14 sm:top-16 z-40 flex flex-col animate-fade-in"
+            style={{ background: 'rgba(2,6,23,0.98)', backdropFilter: 'blur(24px)' }}>
+            <nav className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
               {navLinks.map(({ to, icon: Icon, label, badge }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={() => setMenuOpen(false)}
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
+                <Link key={to} to={to}
+                  className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-base font-medium transition-all
                     ${location.pathname === to
-                      ? 'bg-sky-500/15 text-sky-400'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                    }`}
-                >
-                  <Icon size={16} />
-                  {label}
-                  {badge && badge > 0 && (
-                    <span className="ml-auto w-5 h-5 bg-sky-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {badge}
+                      ? 'bg-sky-500/15 text-sky-400 border border-sky-500/20'
+                      : 'text-slate-400 active:bg-white/5'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center
+                    ${location.pathname === to ? 'bg-sky-500/20' : 'bg-white/5'}`}>
+                    <Icon size={18} />
+                  </div>
+                  <span className="flex-1">{label}</span>
+                  {badge != null && badge > 0 && (
+                    <span className="min-w-[24px] h-6 px-2 bg-sky-500 text-white text-xs font-bold
+                                     rounded-full flex items-center justify-center">
+                      {badge > 9 ? '9+' : badge}
                     </span>
                   )}
                 </Link>
               ))}
             </nav>
+
+            {/* Mobile bottom bar - user info + logout */}
+            <div className="p-4 border-t border-white/8">
+              <div className="flex items-center gap-3 mb-3 px-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-violet-600
+                                flex items-center justify-center text-sm font-bold text-white shrink-0">
+                  {initials}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-200 font-medium text-sm truncate">{userProfile?.fullName}</p>
+                  <p className="text-slate-500 text-xs truncate">{userProfile?.email}</p>
+                </div>
+                {isAdmin && <span className="badge-pending text-xs shrink-0">Admin</span>}
+              </div>
+              <button onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl
+                           bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium
+                           active:bg-red-500/20 transition-all">
+                <LogOut size={16} /> Log Out
+              </button>
+            </div>
           </div>
         )}
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 md:py-8 animate-fade-in">
+      {/* ── Page Content ── */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-6 md:py-8 animate-fade-in">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-4 text-center text-slate-600 text-xs font-body">
-        © 2026   <span className="text-slate-500">CAMPEER</span> — Campus Academic Marketplace for Peer Exchange and Earning Resources
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/5 py-4 px-4 text-center text-slate-600 text-xs">
+        © 2024 <span className="text-slate-500 font-medium">CAMPEER</span>
+        <span className="hidden sm:inline"> — Campus Academic Marketplace for Peer Exchange and Earning Resources</span>
+        <span className="sm:hidden"> — JRMSU Campus Marketplace</span>
       </footer>
     </div>
   );
