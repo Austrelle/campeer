@@ -120,17 +120,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* ── Mobile fullscreen menu ── */}
         {menuOpen && (
-          <div className="lg:hidden fixed inset-0 top-14 sm:top-16 z-40 flex flex-col animate-fade-in"
-            style={{ background: 'rgba(2,6,23,0.98)', backdropFilter: 'blur(24px)' }}>
+          <div className="lg:hidden fixed inset-0 top-14 sm:top-16 z-40 flex flex-col"
+            style={{ background: '#020617' }}>
             <nav className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
               {navLinks.map(({ to, icon: Icon, label, badge }) => (
                 <Link key={to} to={to}
+                  onClick={() => setMenuOpen(false)}
                   className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-base font-medium transition-all
                     ${location.pathname === to
-                      ? 'bg-sky-500/15 text-sky-400 border border-sky-500/20'
-                      : 'text-slate-400 active:bg-white/5'}`}>
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center
-                    ${location.pathname === to ? 'bg-sky-500/20' : 'bg-white/5'}`}>
+                      ? 'bg-sky-500/20 text-sky-400 border border-sky-500/25'
+                      : 'text-slate-300 bg-white/5 border border-white/8'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0
+                    ${location.pathname === to ? 'bg-sky-500/25' : 'bg-white/8'}`}>
                     <Icon size={18} />
                   </div>
                   <span className="flex-1">{label}</span>
@@ -144,8 +145,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
 
-            {/* Mobile bottom bar - user info + logout */}
-            <div className="p-4 border-t border-white/8">
+            {/* Mobile bottom bar */}
+            <div className="p-4 border-t border-white/10" style={{ background: '#0a0f1e' }}>
               <div className="flex items-center gap-3 mb-3 px-2">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-violet-600
                                 flex items-center justify-center text-sm font-bold text-white shrink-0">
@@ -158,9 +159,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {isAdmin && <span className="badge-pending text-xs shrink-0">Admin</span>}
               </div>
               <button onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl
-                           bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium
-                           active:bg-red-500/20 transition-all">
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl
+                           bg-red-500/15 border border-red-500/25 text-red-400 text-sm font-semibold
+                           active:bg-red-500/25 transition-all">
                 <LogOut size={16} /> Log Out
               </button>
             </div>
