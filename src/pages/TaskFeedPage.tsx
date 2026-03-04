@@ -232,9 +232,9 @@ function TaskCard({ task, userProfile, claimingId, deletingId, onClaim, onComple
       <p className="text-slate-400 text-sm leading-relaxed line-clamp-3">{task.description}</p>
 
       {/* ── Tags ── */}
-      {task.tags?.length > 0 && (
+      {(task.tags ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {task.tags.map((tag: string) => (
+          {(task.tags ?? []).map((tag: string) => (
             <span key={tag} className="px-2 py-0.5 bg-white/5 border border-white/10 text-slate-500 text-xs rounded-full">
               {tag}
             </span>

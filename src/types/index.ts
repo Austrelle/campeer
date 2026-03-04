@@ -25,6 +25,9 @@ export interface Task {
   taskId: string;
   requesterId: string;
   requesterName: string;
+  requesterDept?: string;
+  requesterFb?: string;
+  requesterMobile?: string;
   title: string;
   description: string;
   subject: string;

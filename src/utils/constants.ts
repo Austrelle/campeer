@@ -14,7 +14,7 @@ export const CAMPUSES = [
   'JRMSU Godod Campus',
 ];
 
-export const DEPARTMENTS: Record<string, string[]> = {
+export const DEPARTMENTS: Record<string, string> = {
   'CCS': 'College of Computer Studies',
   'COE': 'College of Engineering',
   'CTED': 'College of Teacher Education',
