@@ -42,10 +42,6 @@ export default function WelcomeBackModal({ name, awayMinutes, onStay, onLogout }
               className="w-full btn-primary flex items-center justify-center gap-2 text-sm py-3">
               <LogOut size={15} /> Log Out & Refresh
             </button>
-            <button onClick={onStay}
-              className="w-full btn-secondary flex items-center justify-center gap-2 text-sm py-2.5">
-              <RefreshCw size={14} /> Stay & Continue
-            </button>
           </div>
 
           <p className="text-slate-600 text-[10px] text-center mt-3 leading-relaxed">

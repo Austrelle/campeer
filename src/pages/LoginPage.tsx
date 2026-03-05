@@ -80,8 +80,8 @@ export default function LoginPage() {
         {/* ── FORM CARD ── */}
         <div className="glass-strong p-8 shadow-2xl shadow-black/50">
           <div className="mb-6">
-            <h2 className="text-xl font-display font-bold text-white">Welcome back</h2>
-            <p className="text-slate-400 text-sm mt-1">Sign in to your student account</p>
+            <h2 className="text-xl font-display font-bold text-white">Sign in to your student account</h2>
+
           </div>
 
           {error && (
