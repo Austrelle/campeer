@@ -2,7 +2,7 @@
 import { BookOpen, Zap, Users, Shield } from 'lucide-react';
 
 const creators = [
-  { name: 'xeena.', role: 'Lead Developer & System Architect',      desc: 'Spearheaded the system architecture and full-stack development of CAMPEER.',     gradient: 'from-sky-500 to-blue-600',     initials: 'XE', image: '/team/c.jpg' },
+  { name: 'gwapo', role: 'Lead Developer & System Architect',      desc: 'Spearheaded the system architecture and full-stack development of CAMPEER.',     gradient: 'from-sky-500 to-blue-600',     initials: 'XE', image: '/team/c.jpg' },
   { name: 'Austrelle',     role: 'UI/UX Designer & Frontend Developer',    desc: 'Designed the CAMPEER visual identity and glassmorphism UI, crafting every pixel.', gradient: 'from-violet-500 to-purple-600', initials: 'AU', image: '/team/n.jpg' },
   { name: 'Forge',     role: 'Backend Developer & Database Engineer',  desc: 'Engineered the Firebase backend, real-time listeners, and secure data system.',   gradient: 'from-emerald-500 to-teal-600', initials: 'FO', image: '/team/i.jpg' },
 ];
