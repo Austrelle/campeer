@@ -2,9 +2,14 @@
 import { BookOpen, Zap, Users, Shield } from 'lucide-react';
 
 const creators = [
+<<<<<<< HEAD
+  { name: 'xeena', role: 'Lead Developer & System Architect',      desc: 'Spearheaded the system architecture and full-stack development of CAMPEER.',     gradient: 'from-sky-500 to-blue-600',     initials: 'XE', image: '/team/c.jpg' },
+  { name: 'Austrelle',     role: 'UI/UX Designer & Frontend Developer',    desc: 'Designed the CAMPEER visual identity and glassmorphism UI, crafting every pixel.', gradient: 'from-violet-500 to-purple-600', initials: 'AU', image: '/team/n.jpg' },
+=======
   { name: 'Xeena', role: 'Lead Developer & System Architect',      desc: 'Spearheaded the system architecture and full-stack development of CAMPEER.',     gradient: 'from-sky-500 to-blue-600',     initials: 'XE', image: '/team/c.jpg' },
   { name: 'Lapsnadas',     role: 'UI/UX Designer & Frontend Developer',    desc: 'Designed the CAMPEER visual identity and glassmorphism UI, crafting every pixel.', gradient: 'from-violet-500 to-purple-600', initials: 'AU', image: '/team/n.jpg' },
-  { name: 'Forge',     role: 'Backend Developer & Database Engineer',  desc: 'Engineered the Firebase backend, real-time listeners, and secure data system.',   gradient: 'from-emerald-500 to-teal-600', initials: 'FO', image: '/team/i.jpg' },
+>>>>>>> 73dd95c5e88da1150a766f846508c6b9da418ddc
+  { name: 'high level',     role: 'Backend Developer & Database Engineer',  desc: 'Engineered the Firebase backend, real-time listeners, and secure data system.',   gradient: 'from-emerald-500 to-teal-600', initials: 'FO', image: '/team/i.jpg' },
 ];
 
 const features = [
