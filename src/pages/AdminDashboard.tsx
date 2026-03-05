@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, orderBy, doc, updateDoc, deleteDoc, where, getDocs, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { UserProfile, Task, Feedback } from '../types';
-import { Users, BookOpen, MessageSquare, Shield, CheckCircle, Trash2, Clock, Activity, X, Eye, Facebook, Phone, GraduationCap, Mail } from 'lucide-react';
+import { Users, BookOpen, MessageSquare, Shield, CheckCircle, Trash2, Clock, Activity, X, Eye, Facebook, Phone, GraduationCap, Mail, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
 
 type Tab = 'users' | 'tasks' | 'feedbacks';
@@ -235,7 +235,13 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-slate-500 text-[10px] sm:text-xs">{task.subject}</span>
-                    <span className="text-emerald-400 text-[10px] sm:text-xs font-semibold">₱{task.budget.toLocaleString()}</span>
+                    {(task as any).budgetSecret ? (
+                      <span className="flex items-center gap-1 text-violet-400 text-[10px] sm:text-xs font-semibold">
+                        <EyeOff size={10} /> Secret Price
+                      </span>
+                    ) : (
+                      <span className="text-emerald-400 text-[10px] sm:text-xs font-semibold">₱{task.budget.toLocaleString()}</span>
+                    )}
                     <span className="text-slate-600 text-[10px] sm:text-xs">by {task.requesterName}</span>
                   </div>
                 </div>

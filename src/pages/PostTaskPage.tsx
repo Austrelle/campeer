@@ -11,7 +11,7 @@ import { TASK_SUBJECTS } from '../utils/constants';
 import { btoa } from '../utils/crypto';
 import {
   PlusCircle, AlertCircle, CheckCircle2, ChevronDown,
-  X, Trash2, BookOpen, Clock, List
+  X, Trash2, BookOpen, Clock, List, EyeOff
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -26,6 +26,9 @@ export default function PostTaskPage() {
   const [tagInput, setTagInput] = useState('');
   const [myTasks, setMyTasks] = useState<Task[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Budget mode: 'fixed' = numeric, 'secret' = hidden/negotiable
+  const [budgetMode, setBudgetMode] = useState<'fixed' | 'secret'>('fixed');
 
   const [form, setForm] = useState({
     title: '', description: '', subject: '', budget: '', deadline: '', tags: [] as string[],
@@ -68,8 +71,10 @@ export default function PostTaskPage() {
     if (!form.title.trim())        { setError('Title is required.'); return; }
     if (!form.description.trim())  { setError('Description is required.'); return; }
     if (!form.subject)             { setError('Please select a subject.'); return; }
-    if (!form.budget || isNaN(Number(form.budget)) || Number(form.budget) <= 0)
-                                   { setError('Please enter a valid budget.'); return; }
+    if (budgetMode === 'fixed') {
+      if (!form.budget || isNaN(Number(form.budget)) || Number(form.budget) <= 0)
+        { setError('Please enter a valid budget amount.'); return; }
+    }
     if (!form.deadline)            { setError('Please set a deadline.'); return; }
     setError('');
     setLoading(true);
@@ -83,7 +88,8 @@ export default function PostTaskPage() {
         title:           form.title.trim(),
         description:     form.description.trim(),
         subject:         form.subject,
-        budget:          Number(form.budget),
+        budget:          budgetMode === 'secret' ? 0 : Number(form.budget),
+        budgetSecret:    budgetMode === 'secret',
         deadline:        form.deadline,
         tags:            form.tags,
         status:          'open',
@@ -93,6 +99,7 @@ export default function PostTaskPage() {
       });
       setSuccess(true);
       setForm({ title: '', description: '', subject: '', budget: '', deadline: '', tags: [] });
+      setBudgetMode('fixed');
       setTimeout(() => { setSuccess(false); setTab('my-tasks'); }, 1800);
     } catch (err: any) {
       setError(err.message || 'Failed to post task.');
@@ -156,18 +163,63 @@ export default function PostTaskPage() {
                 placeholder="Describe your task in detail: what needs to be done, specific requirements, expected output, etc." />
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="label-text">Budget (₱) *</label>
-                <input type="number" className="input-field" value={form.budget}
-                  onChange={e => update('budget', e.target.value)} placeholder="e.g. 500" min={1} />
+            {/* ── Budget Field with Secret toggle ── */}
+            <div>
+              <label className="label-text">Price / Budget *</label>
+              {/* Mode selector */}
+              <div className="flex gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setBudgetMode('fixed')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all
+                    ${budgetMode === 'fixed'
+                      ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                      : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300'}`}
+                >
+                  ₱ Set a Price
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBudgetMode('secret')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all
+                    ${budgetMode === 'secret'
+                      ? 'bg-violet-500/15 border-violet-500/30 text-violet-400'
+                      : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300'}`}
+                >
+                  <EyeOff size={14} /> Secret / Negotiate
+                </button>
               </div>
-              <div>
-                <label className="label-text">Deadline *</label>
-                <input type="date" className="input-field" value={form.deadline}
-                  onChange={e => update('deadline', e.target.value)}
-                  min={new Date().toISOString().split('T')[0]} />
-              </div>
+
+              {budgetMode === 'fixed' ? (
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm pointer-events-none">₱</span>
+                  <input
+                    type="number"
+                    className="input-field pl-8"
+                    value={form.budget}
+                    onChange={e => update('budget', e.target.value)}
+                    placeholder="e.g. 500"
+                    min={1}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 px-4 py-3 bg-violet-500/8 border border-violet-500/25 rounded-xl">
+                  <EyeOff size={16} className="text-violet-400 shrink-0" />
+                  <div>
+                    <p className="text-violet-300 text-sm font-semibold">Secret Price</p>
+                    <p className="text-violet-400/70 text-xs leading-relaxed mt-0.5">
+                      The price will be hidden from the feed. Discuss and negotiate directly with the claimer once your task is claimed.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="label-text">Deadline *</label>
+              <input type="date" className="input-field" value={form.deadline}
+                onChange={e => update('deadline', e.target.value)}
+                min={new Date().toISOString().split('T')[0]} />
             </div>
 
             {/* Tags */}
@@ -235,7 +287,13 @@ export default function PostTaskPage() {
                   </div>
                   <p className="text-slate-500 text-xs line-clamp-2 mb-2">{task.description}</p>
                   <div className="flex items-center gap-4 flex-wrap">
-                    <span className="text-emerald-400 font-semibold text-sm">₱{task.budget.toLocaleString()}</span>
+                    {(task as any).budgetSecret ? (
+                      <span className="flex items-center gap-1 text-violet-400 font-semibold text-sm">
+                        <EyeOff size={12} /> Secret Price
+                      </span>
+                    ) : (
+                      <span className="text-emerald-400 font-semibold text-sm">₱{task.budget.toLocaleString()}</span>
+                    )}
                     {task.deadline && (
                       <span className="text-slate-600 text-xs flex items-center gap-1">
                         <Clock size={10} /> Due {task.deadline}

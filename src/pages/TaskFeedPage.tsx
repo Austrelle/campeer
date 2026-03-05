@@ -13,7 +13,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import {
   Search, Clock, Lock, Unlock, User, Phone, Facebook,
   CheckCircle, BookOpen, AlertCircle, Trash2, ExternalLink,
-  ChevronDown, Eye
+  ChevronDown, Eye, EyeOff
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -245,7 +245,13 @@ function TaskCard({ task, userProfile, claimingId, deletingId, onClaim, onComple
       {/* ── Budget + deadline ── */}
       <div className="flex items-center justify-between pt-1 border-t border-white/5">
         <div className="flex items-center gap-4">
-          <span className="text-emerald-400 font-bold text-lg">₱{task.budget.toLocaleString()}</span>
+          {(task as any).budgetSecret ? (
+            <span className="flex items-center gap-1.5 text-violet-400 font-bold text-base">
+              <EyeOff size={14} /> Secret Price
+            </span>
+          ) : (
+            <span className="text-emerald-400 font-bold text-lg">₱{task.budget.toLocaleString()}</span>
+          )}
           {task.deadline && (
             <span className="text-slate-500 text-xs flex items-center gap-1">
               <Clock size={11} /> Due {task.deadline}
