@@ -1,8 +1,8 @@
 // src/hooks/useSessionTimeout.ts
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-const INACTIVE_MS  = 30 * 60 * 1000; // 30 min until warning
-const WARNING_MS   =  2 * 60 * 1000; //  2 min warning countdown
+const INACTIVE_MS  = 60 * 1000; 
+const WARNING_MS   = 10 * 1000; 
 
 interface Options { onLogout: () => void; enabled: boolean; }
 

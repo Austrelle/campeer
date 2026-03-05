@@ -45,10 +45,6 @@ export default function SessionTimeoutModal({ countdown, onStay, onLogout }: Pro
           </p>
 
           <div className="flex gap-2 sm:gap-3">
-            <button onClick={onStay}
-              className="flex-1 btn-primary flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5">
-              <LogIn size={14} /> Stay Logged In
-            </button>
             <button onClick={onLogout}
               className="flex-1 btn-danger flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5">
               <LogOut size={14} /> Log Out
