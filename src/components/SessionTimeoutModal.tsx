@@ -7,7 +7,7 @@ export default function SessionTimeoutModal({ countdown, onStay, onLogout }: Pro
   const mins    = Math.floor(countdown / 60);
   const secs    = countdown % 60;
   const timeStr = mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}s`;
-  const pct     = countdown / 120;
+  const pct     = countdown / 50;
   const color   = pct > 0.5 ? '#f59e0b' : pct > 0.25 ? '#f97316' : '#ef4444';
   const r = 26; const circ = 2 * Math.PI * r;
 
