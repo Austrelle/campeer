@@ -81,7 +81,7 @@ export default function LoginPage() {
         <div className="glass-strong p-8 shadow-2xl shadow-black/50">
           <div className="mb-6">
             <h2 className="text-xl font-display font-bold text-white">Sign in to your student account</h2>
-
+    
           </div>
 
           {error && (
