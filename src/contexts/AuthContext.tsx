@@ -65,28 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     await setDoc(doc(db, 'users', user.uid), profile);
     await signOut(auth);
-
-    // ── SMS notification to admin via Semaphore ──────────────────
-    // Add VITE_SEMAPHORE_API_KEY and VITE_ADMIN_PHONE to your .env file
-    try {
-      const apiKey     = import.meta.env.VITE_SEMAPHORE_API_KEY as string;
-      const adminPhone = import.meta.env.VITE_ADMIN_PHONE as string;
-      if (apiKey && adminPhone) {
-        const smsBody = new URLSearchParams({
-          apikey:     apiKey,
-          number:     adminPhone,
-          message:    `[CAMPEER] New pending registration:\n${data.fullName} (${data.studentId})\n${email}\n${data.academic?.dept} - ${data.academic?.course}\nOpen Admin Dashboard to approve.`,
-          sendername: 'CAMPEER',
-        });
-        await fetch('https://api.semaphore.co/api/v4/messages', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body:    smsBody.toString(),
-        });
-      }
-    } catch {
-      // SMS failure must never block registration
-    }
   };
 
   const login = async (email: string, password: string) => {
