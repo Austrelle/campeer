@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [form, setForm] = useState({
     fullName: '',
@@ -71,6 +72,7 @@ export default function RegisterPage() {
   };
 
   const handleSubmit = async () => {
+    if (!agreedToTerms) { setError('Please accept the Terms of Use to continue.'); return; }
     const err = validateStep3();
     if (err) { setError(err); return; }
     setError('');
@@ -124,7 +126,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-lg animate-slide-up relative z-10">
         {/* Logo */}
         <div className="text-center mb-6">
-          <h1 className="campeer-logo-hero text-5xl sm:text-6xl block mb-2" style={{ lineHeight: 1.1 }}>CAMPEER</h1>
+          <h1 className="campeer-logo-hero text-5xl sm:text-6xl mb-2" style={{ lineHeight: 1.1, overflow: 'visible' }}>CAMPEER</h1>
           <p className="text-slate-400 text-sm">Create your student account</p>
         </div>
 
@@ -277,6 +279,33 @@ export default function RegisterPage() {
               <div className="p-3 bg-amber-500/8 border border-amber-500/20 rounded-xl">
                 <p className="text-amber-400/80 text-xs">⏳ After submitting, your account requires admin approval before you can log in.</p>
               </div>
+
+              {/* Terms checkbox */}
+              <div
+                onClick={() => setAgreedToTerms(v => !v)}
+                className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none
+                  ${agreedToTerms
+                    ? 'bg-sky-500/10 border-sky-500/30'
+                    : 'bg-white/3 border-white/10 hover:border-white/20'}`}
+              >
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all
+                  ${agreedToTerms ? 'bg-sky-500 border-sky-500' : 'border-slate-500 bg-transparent'}`}>
+                  {agreedToTerms && (
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                      <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  I have read and agree to the{' '}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors font-medium">
+                    Terms of Use
+                  </a>
+                  {' '}and confirm I will use CAMPEER responsibly and ethically as a JRMSU student.
+                </p>
+              </div>
             </div>
           )}
 
@@ -292,7 +321,9 @@ export default function RegisterPage() {
                 Continue
               </button>
             ) : (
-              <button onClick={handleSubmit} disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2">
+              <button onClick={handleSubmit} disabled={loading || !agreedToTerms}
+                className={`btn-primary flex-1 flex items-center justify-center gap-2 transition-all
+                  ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <UserPlus size={16} />}
                 {loading ? 'Registering...' : 'Create Account'}
               </button>

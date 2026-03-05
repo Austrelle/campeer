@@ -11,6 +11,7 @@ import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import FeedbackPage from './pages/FeedbackPage';
 import AdminDashboard from './pages/AdminDashboard';
+import TermsPage from './pages/TermsPage';
 import Layout from './components/Layout';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
@@ -47,6 +48,7 @@ function AppRoutes() {
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/pending" element={<PendingPage />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="/home" element={<ProtectedRoute><Layout><HomePage /></Layout></ProtectedRoute>} />
       <Route path="/tasks" element={<ProtectedRoute><Layout><TaskFeedPage /></Layout></ProtectedRoute>} />
       <Route path="/post-task" element={<ProtectedRoute><Layout><PostTaskPage /></Layout></ProtectedRoute>} />
@@ -54,6 +56,7 @@ function AppRoutes() {
       <Route path="/about" element={<ProtectedRoute><Layout><AboutPage /></Layout></ProtectedRoute>} />
       <Route path="/feedback" element={<ProtectedRoute><Layout><FeedbackPage /></Layout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute adminOnly><Layout><AdminDashboard /></Layout></ProtectedRoute>} />
+      <Route path="/terms-inside" element={<ProtectedRoute><Layout><TermsPage /></Layout></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

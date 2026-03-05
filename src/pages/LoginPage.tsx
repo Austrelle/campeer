@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +20,7 @@ export default function LoginPage() {
       setError('Please fill in all fields.');
       return;
     }
+    if (!agreedToTerms) { setError('Please accept the Terms of Use to continue.'); return; }
     setError('');
     setLoading(true);
     try {
@@ -57,8 +59,8 @@ export default function LoginPage() {
 
           {/* Main CAMPEER title — ultra visible */}
           <h1
-            className="campeer-logo-hero text-6xl sm:text-7xl block mb-3 select-none"
-            style={{ lineHeight: 1.05 }}
+            className="campeer-logo-hero text-6xl sm:text-7xl mb-3 select-none"
+            style={{ lineHeight: 1.1, overflow: 'visible' }}
           >
             CAMPEER
           </h1>
@@ -123,10 +125,38 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Terms checkbox */}
+            <div
+              onClick={() => setAgreedToTerms(v => !v)}
+              className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none
+                ${agreedToTerms
+                  ? 'bg-sky-500/10 border-sky-500/30'
+                  : 'bg-white/3 border-white/10 hover:border-white/20'}`}
+            >
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all
+                ${agreedToTerms ? 'bg-sky-500 border-sky-500' : 'border-slate-500 bg-transparent'}`}>
+                {agreedToTerms && (
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                I have read and agree to the{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors font-medium">
+                  Terms of Use
+                </a>
+                {' '}and confirm I will use CAMPEER responsibly and ethically.
+              </p>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
-              className="btn-primary w-full flex items-center justify-center gap-2 mt-1 py-3"
+              disabled={loading || !agreedToTerms}
+              className={`btn-primary w-full flex items-center justify-center gap-2 mt-1 py-3 transition-all
+                ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {loading
                 ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
